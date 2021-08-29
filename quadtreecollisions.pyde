@@ -4,42 +4,14 @@
 #
 # v0.01  - Create the Particle class
 # v0.02  - Make the particles check if they intersect, move, and highlight
-# v0.021 - Make intersection line
+# v0.021 - Add intersection line
 # v0.03  - Use quadtrees to detect collisions
 
 
-class Particle:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.r = 12
-        self.highlighted = False
-        
-    
-    def render(self):
-        noStroke()
-        if self.highlighted:
-            fill(0, 0, 100)
-        else:
-            fill(0, 0, 50)
-        circle(self.x, self.y, self.r*2)
-    
-    
-    def move(self):
-        self.x += random(-1, 1)
-        self.y += random(-1, 1)
-    
-    
-    def intersects(self, other):
-        return dist(self.x, self.y, other.x, other.y) < self.r + other.r
-    
-    
-    def highlight(self):
-        self.highlighted = True
-        
-    
-    def reset_highlight(self):
-        self.highlighted = False
+from Particle import *
+from Point import *
+from Quadtree import *
+from Rectangle import *
         
         
 def setup():
@@ -47,8 +19,13 @@ def setup():
     colorMode(HSB, 360, 100, 100, 100)
     size(600, 400)
     particles = []
-    for i in range(100):
-        particles.append(Particle(random(20, width-20), random(20, height-20)))
+    points = []
+    for i in range(1000):
+        particle = Particle(random(20, width-20), random(20, height-20))
+        particles.append(particle)
+        p = Point(particle.x, particle.y, particle)
+        points.append(p)
+        
     
 def draw():
     global particles
@@ -63,11 +40,43 @@ def draw():
             if (particle != other) and (particle.intersects(other)):
                 particle.highlight()
                 
-
+                # Our goal for the code below is to create the average line
+                # of intersection.
+                # We need to figure out the distance PVector to compute the 
+                # average point.
+                distance = PVector(other.x, other.y).sub(PVector(particle.x, 
+                                                                 particle.y))
+                # We'll use direction and magnitude to compute the average
+                # point.
+                direction = distance.heading()
+                magnitude = distance.mag()
+                # Average is the average point, but in order to do that,
+                # we need to add half the cosine of the angle times 
+                # the magnitude of the distance divided by 2 and the
+                # sine of the angle times the magnitude of the distance
+                # divided by 2 to get the average point.
+                average = PVector(particle.x + magnitude*cos(direction)/2, 
+                                  particle.y + magnitude*sin(direction)/2)
+                
+                # We now want to show a line at the average point 
+                # that is perpendicuular to our distance vector.
+                pushMatrix()
+                translate(average.x, average.y)
+                # We're rotating to the direction that we want to be in,
+                # the direction vector.
+                rotate(direction)
+                stroke(0, 50, 100)
+                strokeWeight(1)
+                # We want to draw a line perpendicular, not parellel!
+                line(0, -15, 0, 15)
+                popMatrix()
+                noStroke()                
                 
                 
         
         particle.render()
         particle.move()
+    
+    print(frameRate)
     
     
