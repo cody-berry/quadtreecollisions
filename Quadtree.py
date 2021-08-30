@@ -1,3 +1,8 @@
+
+
+from Rectangle import *
+
+
 class Quadtree:
     def __init__(self, boundary, point_cap): # boundary is a Rectangle
         self.boundary = boundary
