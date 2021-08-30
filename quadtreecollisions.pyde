@@ -20,8 +20,8 @@ def setup():
     size(600, 400)
     particles = []
     points = []
-    # boundary = Rectangle(0, 0, width, height)
-    # qt = Quadtree(boundary, 4)
+    boundary = Rectangle(0, 0, width, height)
+    qt = Quadtree(boundary, 4)
     for i in range(1000):
         particle = Particle(random(width), random(height-20))
         particles.append(particle)
@@ -34,7 +34,7 @@ def draw():
     global particles, points, qt
     background(210, 80, 32)
     boundary = Rectangle(0, 0, width, height)
-    qt = Quadtree(boundary, 4)
+    qt.reset_points()
     
     for particle in particles:
         p = Point(particle.x, particle.y, particle)
@@ -54,39 +54,39 @@ def draw():
         for other in others:
             if (particle != other.data) and (particle.intersects(other.data)):
                 particle.highlight()
+                other_p = other.data
                 
-                # # Our goal for the code below is to create the average line
-                # # of intersection.
-                # # We need to figure out the distance PVector to compute the 
-                # # average point.
-                # distance = PVector(other.data.x, other.data.y).sub(PVector(
-                #                                                            p.data.x, 
-                #                                                           p.data.y))
-                # # We'll use direction and magnitude to compute the average
-                # # point.
-                # direction = distance.heading()
-                # magnitude = distance.mag()
-                # # Average is the average point, but in order to do that,
-                # # we need to add half the cosine of the angle times 
-                # # the magnitude of the distance divided by 2 and the
-                # # sine of the angle times the magnitude of the distance
-                # # divided by 2 to get the average point.
-                # average = PVector(p.data.x + magnitude*cos(direction)/2, 
-                #                   p.data.y + magnitude*sin(direction)/2)
+                # Our goal for the code below is to create the average line
+                # of intersection.
+                # We need to figure out the distance PVector to compute the 
+                # average point.
+                distance = PVector(other_p.x, other_p.y).sub(PVector(particle.x, 
+                                                                     particle.y))
+                # We'll use direction and magnitude to compute the average
+                # point.
+                direction = distance.heading()
+                magnitude = distance.mag()
+                # Average is the average point, but in order to do that,
+                # we need to add half the cosine of the angle times 
+                # the magnitude of the distance divided by 2 and the
+                # sine of the angle times the magnitude of the distance
+                # divided by 2 to get the average point.
+                average = PVector(particle.x + magnitude*cos(direction)/2, 
+                                  particle.y + magnitude*sin(direction)/2)
                 
-                # # We now want to show a line at the average point 
-                # # that is perpendicuular to our distance vector.
-                # pushMatrix()
-                # translate(average.x, average.y)
-                # # We're rotating to the direction that we want to be in,
-                # # the direction vector.
-                # rotate(direction)
-                # stroke(0, 50, 100)
-                # strokeWeight(1)
-                # # We want to draw a line perpendicular, not parellel!
-                # line(0, -15, 0, 15)
-                # popMatrix()
-                # noStroke()                
+                # We now want to show a line at the average point 
+                # that is perpendicuular to our distance vector.
+                pushMatrix()
+                translate(average.x, average.y)
+                # We're rotating to the direction that we want to be in,
+                # the direction vector.
+                rotate(direction)
+                stroke(0, 50, 100)
+                strokeWeight(1)
+                # We want to draw a line perpendicular, not parellel!
+                line(0, -15, 0, 15)
+                popMatrix()
+                noStroke()                
                 
                 
     for particle in particles:  

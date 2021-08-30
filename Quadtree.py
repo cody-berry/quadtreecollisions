@@ -122,3 +122,12 @@ class Quadtree:
             
             
         return found
+    
+    
+    def reset_points(self):
+        self.points = []
+        if self.divided:
+            self.northwest.reset_points()
+            self.southwest.reset_points()
+            self.northeast.reset_points()
+            self.southeast.reset_points()
